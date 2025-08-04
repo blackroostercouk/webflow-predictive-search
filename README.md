@@ -1,108 +1,76 @@
-# Webflow Predictive Search Component
+# Webflow Predictive Search
 
-A responsive, customizable predictive search component that integrates with Webflow CMS collections.
+A Next.js application that provides real-time predictive search functionality for Webflow CMS collections. This application allows users to search through Webflow CMS content with instant results.
 
 ## Features
 
-- Real-time search as you type
-- Displays search results from Webflow CMS collections
+- Real-time predictive search as you type
+- Fetches data directly from Webflow CMS
 - Responsive design that works on all devices
-- Loading states and error handling
-- No results found message
-- Easy to customize and style
+- Client-side caching for better performance
+- Built with Next.js 13+ and TypeScript
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js 16.8 or later
 - npm or yarn
 - Webflow account with API access
-- A Webflow collection with items you want to search through
 
-## Setup
+## Environment Variables
 
-1. Clone this repository
+Create a `.env.local` file in the root directory and add the following variables:
+
+```bash
+NEXT_PUBLIC_WEBFLOW_API_TOKEN=your_webflow_api_token
+NEXT_PUBLIC_WEBFLOW_SITE_ID=your_webflow_site_id
+NEXT_PUBLIC_WEBFLOW_COLLECTION_ID=your_webflow_collection_id
+```
+
+You can obtain these credentials by following the instructions in the [Webflow Developer Documentation](https://developers.webflow.com/).
+
+## Getting Started
+
+1. Clone the repository
 2. Install dependencies:
+
    ```bash
    npm install
-   ```
-3. Create a `.env` file in the root directory with your Webflow API credentials:
-   ```
-   REACT_APP_WEBFLOW_API_TOKEN=your_webflow_api_token_here
-   REACT_APP_WEBFLOW_SITE_ID=your_site_id_here
-   REACT_APP_WEBFLOW_COLLECTION_ID=your_collection_id_here
+   # or
+   yarn install
    ```
 
-## Configuration
+3. Set up your environment variables (see above)
+4. Run the development server:
 
-### Webflow API Setup
-
-1. Get your Webflow API token from [Webflow Account Settings](https://webflow.com/dashboard/account)
-2. Find your Site ID in the Webflow dashboard URL when viewing your site settings
-3. Find your Collection ID in the URL when viewing your collection in the Webflow Designer
-
-### Customizing Search Fields
-
-Edit `src/config/webflow.js` to specify which fields from your collection should be searchable:
-
-```javascript
-export const webflowConfig = {
-  // ...
-  searchFields: ['name', 'description', 'category'] // Add your collection field names here
-};
-```
-
-## Running Locally
-
-```bash
-npm start
-```
-
-This will start the development server at [http://localhost:3000](http://localhost:3000)
-
-## Building for Production
-
-```bash
-npm run build
-```
-
-This will create a production build in the `build` folder.
-
-## Deploying to Webflow
-
-### Option 1: Using an iframe (Recommended)
-
-1. Build the project: `npm run build`
-2. Host the `build` folder on a static hosting service (Netlify, Vercel, GitHub Pages, etc.)
-3. In Webflow, add an Embed component and use an iframe to embed your search component:
-   ```html
-   <iframe 
-     src="YOUR_DEPLOYED_APP_URL" 
-     style="width: 100%; min-height: 400px; border: none;"
-     title="Search"
-   ></iframe>
+   ```bash
+   npm run dev
+   # or
+   yarn dev
    ```
 
-### Option 2: Using Webflow Custom Code
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-1. Build the project: `npm run build`
-2. Copy the contents of `build/static/js/main.[hash].js` and `build/static/css/main.[hash].css`
-3. In Webflow, go to Project Settings > Custom Code
-4. Add the CSS to the `<head>` section
-5. Add the JS to the `</body>` section
-6. Add a div with id `root` where you want the search to appear:
-   ```html
-   <div id="root"></div>
-   ```
+## Project Structure
 
-## Customizing the Look and Feel
+- `app/` - Next.js 13+ app directory with page and layout components
+- `src/components/` - Reusable React components
+- `src/services/` - API services and data fetching logic
+- `src/config/` - Application configuration
+- `public/` - Static assets
 
-You can customize the appearance by modifying the styles in `src/PredictiveSearch.js`. The component uses CSS-in-JS with template literals for styling.
+## Deployment
 
-## Troubleshooting
+### Vercel
 
-- **CORS Issues**: Make sure your Webflow API token has the correct permissions
-- **No Results**: Verify your collection ID and that the collection has published items
-- **Styling Issues**: Check for CSS conflicts with Webflow's styles
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fwebflow-predictive-search&env=NEXT_PUBLIC_WEBFLOW_API_TOKEN,NEXT_PUBLIC_WEBFLOW_SITE_ID,NEXT_PUBLIC_WEBFLOW_COLLECTION_ID&envDescription=Required%20environment%20variables%20for%20Webflow%20API%20access)
+
+### Webflow Cloud
+
+This application is configured to be deployed to Webflow Cloud. Follow these steps:
+
+1. Push your code to a GitHub repository
+2. Connect the repository to your Webflow site
+3. Set up the required environment variables in your Webflow project settings
 
 ## License
 
