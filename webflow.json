@@ -1,11 +1,15 @@
 {
   "name": "predictive-search",
   "version": "1.0.0",
-  "cosmic": {
-    "type": "static",
-    "framework": "create-react-app",
-    "buildCommand": "npm run build:webflow",
-    "publishDir": "webflow/build"
+  "webflow": {
+    "build": {
+      "command": "npm run build:webflow",
+      "publish": "webflow/build"
+    },
+    "mounts": {
+      "/app": "."
+    },
+    "nodeVersion": "18.x"
   },
   "scripts": {
     "start": "react-scripts start",
