@@ -2,6 +2,7 @@
   "name": "predictive-search",
   "version": "1.0.0",
   "webflow": {
+    "framework": "create-react-app",
     "build": {
       "command": "npm run build:webflow",
       "publish": "webflow/build"
