@@ -2,17 +2,32 @@
   "name": "predictive-search",
   "version": "1.0.0",
   "main": "build/static/js/main.js",
+  "cosmic": {
+    "type": "static",
+    "buildCommand": "npm run build:webflow",
+    "publishDir": "webflow/build",
+    "installCommand": "npm install",
+    "nodeVersion": "18.x"
+  },
   "scripts": {
-    "build": "react-scripts build",
     "start": "react-scripts start",
+    "build": "react-scripts build",
+    "build:webflow": "node scripts/build-for-webflow.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4",
+    "axios": "^1.11.0",
+    "lodash.debounce": "^4.0.8"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0"
   },
   "browserslist": {
     "production": [
@@ -25,16 +40,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0"
   }
 }
