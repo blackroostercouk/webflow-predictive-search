@@ -1,31 +1,45 @@
-// This is a minimal Next.js config for Webflow Cloud
-// It ensures compatibility with Webflow's build system
+// Webflow Cloud requires this specific configuration
+// to properly build and deploy Next.js applications
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Required for Webflow Cloud
+  output: 'standalone',
+  
+  // Ensure static export compatibility
   reactStrictMode: true,
-  output: 'export',
   trailingSlash: true,
-  // Disable image optimization as it requires a server
+  
+  // Disable features not needed for static export
   images: {
     unoptimized: true,
+    domains: [],
   },
-  // Disable TypeScript and ESLint during build
+  
+  // Disable build-time checks
   eslint: {
     ignoreDuringBuilds: true,
   },
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Custom webpack config to ensure static export works correctly
+  
+  // Webpack configuration for Webflow compatibility
   webpack: (config, { isServer }) => {
+    // Fixes npm packages that depend on `fs` module
     if (!isServer) {
-      // Ensures static files are properly handled
-      config.resolve.fallback = { fs: false, path: false };
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        stream: false,
+        crypto: false,
+      };
     }
     return config;
   },
-  // Disable server components as they're not needed for static export
+  
+  // Disable server components for static export
   experimental: {
     serverComponents: false,
   },
