@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/cf-build.js",
+    "build": "next build && npm run postbuild",
+    "postbuild": "node scripts/cf-build.js",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "deploy": "npm run build"
+    "deploy": "npm run build",
+    "webflow:build": "next build"
   },
   "dependencies": {
     "lodash.debounce": "^4.0.8",
@@ -24,6 +26,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^8.0.0",
     "eslint-config-next": "15.4.5",
+    "fs-extra": "^11.2.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.0.0"

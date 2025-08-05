@@ -1,89 +1,59 @@
 const { execSync } = require('child_process');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 
-// Custom build directory to avoid conflicts
-const BUILD_DIR = '.cf-pages';
+const OUTPUT_DIR = 'out'; // Next.js 13+ uses 'out' with output: 'export'
 
-console.log('🚀 Starting Cloudflare Pages build process...');
+console.log('🚀 Starting Webflow build process...');
 
-// 1. Clean up previous builds
-console.log('🧹 Cleaning up previous builds...');
+// 1. Clean up
+console.log('🧹 Cleaning up...');
 try {
-  fs.rmSync(BUILD_DIR, { recursive: true, force: true });
-  fs.mkdirSync(BUILD_DIR, { recursive: true });
-  console.log('✅ Cleanup completed');
+  if (fs.existsSync(OUTPUT_DIR)) fs.removeSync(OUTPUT_DIR);
+  fs.ensureDirSync('.next');
+  console.log('✅ Cleanup complete');
 } catch (error) {
-  console.error('❌ Failed to clean up build directory');
+  console.error('❌ Cleanup failed:', error.message);
   process.exit(1);
 }
 
-// 2. Run Next.js build
-console.log('\n🔨 Building Next.js application...');
+// 2. Build with Next.js
+console.log('\n🔨 Building Next.js app...');
 try {
-  // Set environment variables to prevent Vercel CLI execution
   const env = {
     ...process.env,
+    NODE_ENV: 'production',
     NEXT_TELEMETRY_DISABLED: '1',
     VERCEL: '0',
     NOW_BUILDER: '0',
-    NODE_ENV: 'production',
-    // Custom output directory
-    NEXT_OUTPUT: 'standalone',
-    // Disable Vercel CLI
-    VERCEL_CLI_VERSION: '0.0.0',
+    NEXT_OUTPUT: 'export'
   };
 
-  // Run Next.js build with custom output directory
-  execSync('next build', { 
-    stdio: 'inherit',
-    env
-  });
-  
-  console.log('✅ Next.js build completed successfully');
+  execSync('next build', { stdio: 'inherit', env, shell: true });
+  console.log('✅ Build completed');
 } catch (error) {
-  console.error('❌ Next.js build failed');
+  console.error('❌ Build failed');
   process.exit(1);
 }
 
-// 3. Prepare for Cloudflare Pages
-console.log('\n☁️  Preparing for Cloudflare Pages...');
+// 3. Verify output
+console.log('\n🔍 Verifying output...');
 try {
-  // Copy static files to the build directory
-  const copyRecursiveSync = (src, dest) => {
-    const exists = fs.existsSync(src);
-    const stats = exists && fs.statSync(src);
-    const isDirectory = exists && stats.isDirectory();
-    
-    if (isDirectory) {
-      if (!fs.existsSync(dest)) {
-        fs.mkdirSync(dest, { recursive: true });
-      }
-      fs.readdirSync(src).forEach(childItemName => {
-        copyRecursiveSync(
-          path.join(src, childItemName),
-          path.join(dest, childItemName)
-        );
-      });
-    } else if (exists) {
-      fs.copyFileSync(src, dest);
+  if (!fs.existsSync(OUTPUT_DIR)) {
+    if (fs.existsSync('.next/export')) {
+      console.log('ℹ️  Found output in .next/export, copying to out/...');
+      fs.copySync('.next/export', OUTPUT_DIR);
+    } else {
+      throw new Error(`No build output found in ${OUTPUT_DIR} or .next/export`);
     }
-  };
-
-  // Copy .next/static and public directories
-  if (fs.existsSync('.next/static')) {
-    copyRecursiveSync('.next/static', `${BUILD_DIR}/_next/static`);
   }
+
+  // Add SPA redirects
+  fs.writeFileSync(path.join(OUTPUT_DIR, '_redirects'), '/* /index.html 200');
   
-  if (fs.existsSync('public')) {
-    copyRecursiveSync('public', `${BUILD_DIR}/`);
-  }
-
-  console.log('✅ Cloudflare Pages build prepared successfully');
-  console.log(`📦 Build output available in: ${path.resolve(BUILD_DIR)}`);
+  console.log(`✅ Webflow build ready in: ${path.resolve(OUTPUT_DIR)}`);
+  console.log('\n✨ Build process completed!');
 } catch (error) {
-  console.error('❌ Failed to prepare Cloudflare Pages build:', error);
+  console.error('❌ Verification failed:', error.message);
   process.exit(1);
 }
-
-console.log('\n✨ Build process completed successfully!');
