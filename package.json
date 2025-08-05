@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "postbuild": "npx @cloudflare/next-on-pages@1",
+    "build": "node scripts/cf-build.js",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
@@ -18,7 +17,6 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.13",
     "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
@@ -32,5 +30,6 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "packageManager": "npm@10.2.4"
 }

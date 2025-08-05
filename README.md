@@ -8,11 +8,12 @@ A Next.js application that provides real-time predictive search functionality fo
 - Fetches data directly from Webflow CMS
 - Responsive design that works on all devices
 - Client-side caching for better performance
-- Built with Next.js 13+ and TypeScript
+- Built with Next.js 15+ and TypeScript
+- Optimized for Webflow Cloud deployment
 
 ## Prerequisites
 
-- Node.js 16.8 or later
+- Node.js 18 or later
 - npm or yarn
 - Webflow account with API access
 
@@ -47,6 +48,51 @@ You can obtain these credentials by following the instructions in the [Webflow D
    # or
    yarn dev
    ```
+
+## Building for Production
+
+To create a production build:
+
+```bash
+npm run build
+# or
+yarn build
+```
+
+This will create a static export in the `.cf-pages` directory, optimized for Webflow Cloud deployment.
+
+## Webflow Cloud Deployment
+
+To deploy to Webflow Cloud:
+
+1. Push your code to a GitHub repository
+2. In Webflow, go to your project settings
+3. Navigate to the "Hosting" tab
+4. Connect your GitHub repository
+5. Configure the build settings:
+   - Build command: `npm run build`
+   - Publish directory: `.cf-pages`
+6. Save and deploy
+
+## Customizing the Search
+
+You can customize the search functionality by modifying the following files:
+
+- `app/page.tsx` - Main search interface
+- `components/Search.tsx` - Search component logic
+- `lib/webflow.ts` - Webflow API integration
+
+## Troubleshooting
+
+### Build Issues
+- Make sure all environment variables are set
+- Ensure you're using Node.js 18 or later
+- Clear the `.next` and `node_modules` directories and reinstall dependencies if needed
+
+### Search Not Working
+- Verify your Webflow API token has the correct permissions
+- Check that the site ID and collection ID are correct
+- Ensure the collection has published items
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
