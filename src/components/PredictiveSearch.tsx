@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import { searchItems, WebflowItem } from '@/services/webflowService';
-import styles from './PredictiveSearch.module.css';
 
-const PredictiveSearch = () => {
+interface PredictiveSearchProps {
+  className?: string;
+}
+
+const PredictiveSearch: React.FC<PredictiveSearchProps> = ({ className = '' }) => {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<WebflowItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,7 +69,7 @@ const PredictiveSearch = () => {
   }, [debouncedSearch]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const { value } = e.target;
     setQuery(value);
     debouncedSearch(value);
   };
@@ -80,7 +83,7 @@ const PredictiveSearch = () => {
   };
 
   return (
-    <div className="predictive-search">
+    <div className={`predictive-search ${className}`}>
       <div className="search-container">
         <input
           type="text"
@@ -121,13 +124,15 @@ const PredictiveSearch = () => {
                 >
                   <div className="suggestion-name">{item.name}</div>
                   {item.category && (
-                    <div className="suggestion-category">{item.category}</div>
+                    <div className="suggestion-category">{item.category as string}</div>
                   )}
                 </li>
               ))}
             </ul>
           ) : query ? (
-            <div className="no-results">No results found for "{query}"</div>
+            <div className="no-results">
+              No results found for &quot;{query}&quot;
+            </div>
           ) : null}
         </div>
       )}

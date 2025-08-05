@@ -2,32 +2,35 @@
   "name": "nextjs-migration",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "node scripts/build.js",
-    "start": "next start",
-    "lint": "next lint",
-    "deploy": "npx @cloudflare/next-on-pages",
-    "preview": "npx @cloudflare/next-on-pages --watch",
-    "cf-typegen": "npx @cloudflare/next-on-pages --experimental-minify-type-annotations"
-  },
+ "scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "postbuild": "npx @cloudflare/next-on-pages --no-vercel",
+  "start": "next start",
+  "lint": "next lint",
+  "type-check": "tsc --noEmit",
+  "deploy": "npm run build"
+},
   "dependencies": {
     "lodash.debounce": "^4.0.8",
-    "next": "15.4.5",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "next": "^15.4.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.10.0",
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
+    "@cloudflare/next-on-pages": "^1.13.13",
     "@types/lodash.debounce": "^4.0.9",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.0.0",
     "eslint-config-next": "15.4.5",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

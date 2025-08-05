@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import { searchItems } from './services/webflowService';
 
@@ -28,33 +28,44 @@ const PredictiveSearch = () => {
     initialize();
   }, []);
 
-  // Fetch suggestions from Webflow
-  const fetchSuggestions = useCallback(debounce(async (searchQuery) => {
-    if (!searchQuery.trim()) {
-      setSuggestions([]);
-      return;
-    }
+  // Create a memoized debounced search function
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(async (searchQuery) => {
+        if (!searchQuery.trim()) {
+          setSuggestions([]);
+          return;
+        }
 
-    if (!isInitialized) return;
+        if (!isInitialized) return;
 
-    setIsLoading(true);
-    setError(null);
+        setIsLoading(true);
+        setError(null);
 
-    try {
-      const results = await searchItems(searchQuery);
-      setSuggestions(results);
-    } catch (err) {
-      console.error('Error fetching suggestions:', err);
-      setError('Failed to fetch suggestions. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, 300), [isInitialized]);
+        try {
+          const results = await searchItems(searchQuery);
+          setSuggestions(results);
+        } catch (err) {
+          console.error('Error fetching suggestions:', err);
+          setError('Failed to fetch suggestions. Please try again.');
+        } finally {
+          setIsLoading(false);
+        }
+      }, 300),
+    [isInitialized]
+  );
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
 
   const handleInputChange = (e) => {
-    const value = e.target.value;
+    const { value } = e.target;
     setQuery(value);
-    fetchSuggestions(value);
+    debouncedSearch(value);
   };
 
   const handleSuggestionClick = (suggestion) => {
@@ -89,15 +100,25 @@ const PredictiveSearch = () => {
                   key={item.id} 
                   className="suggestion-item"
                   onClick={() => handleSuggestionClick(item)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSuggestionClick(item);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
                 >
                   <div className="suggestion-name">{item.name}</div>
-                  <div className="suggestion-category">{item.category}</div>
+                  {item.category && (
+                    <div className="suggestion-category">{item.category}</div>
+                  )}
                 </li>
               ))}
             </ul>
           ) : (
             <div className="no-results">
-              No results found for "{query}"
+              No results found for &quot;{query}&quot;
             </div>
           )}
         </div>
@@ -142,7 +163,6 @@ const PredictiveSearch = () => {
           z-index: 1000;
           overflow: hidden;
         }
-        
         .suggestions-list {
           max-height: 300px;
           overflow-y: auto;
@@ -162,16 +182,14 @@ const PredictiveSearch = () => {
           font-weight: 500;
         }
         .suggestion-category {
-          font-size: 0.8rem;
+          font-size: 0.875rem;
           color: #666;
           margin-top: 0.25rem;
         }
-        
         .no-results {
           padding: 1rem;
           color: #666;
           text-align: center;
-          font-style: italic;
         }
       `}</style>
     </div>

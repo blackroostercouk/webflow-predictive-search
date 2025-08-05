@@ -44,5 +44,5 @@ export interface WebflowItem {
   _id: string;
   name: string;
   slug: string;
-  [key: string]: any;
+  [key: string]: string | number | boolean | string[] | number[] | null | undefined;
 }

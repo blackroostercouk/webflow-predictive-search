@@ -1,33 +1,35 @@
-import { webflowConfig, getApiHeaders } from '../config/webflow';
+import { webflowConfig, WebflowItem } from '../config/webflow';
+
+// Re-export WebflowItem type for use in other files
+export type { WebflowItem };
 
 // Cache for storing fetched items
-let cachedItems: any[] = [];
+let cachedItems: WebflowItem[] = [];
 let lastFetchTime = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
 
 // Request queue to prevent duplicate concurrent requests
 let isFetching = false;
-let fetchQueue: Array<{ resolve: (value: any) => void; reject: (reason?: any) => void }> = [];
+type QueueItem = {
+  resolve: (value: WebflowItem[] | PromiseLike<WebflowItem[]>) => void;
+  reject: (reason?: Error) => void;
+};
+let fetchQueue: QueueItem[] = [];
 
 // Helper function to process the queue
-const processQueue = (error: Error | null, items?: any[]) => {
+const processQueue = (error: Error | null, items?: WebflowItem[]) => {
   fetchQueue.forEach(promise => {
     if (error) {
       promise.reject(error);
-    } else {
+    } else if (items) {
       promise.resolve(items);
+    } else {
+      promise.reject(new Error('No items provided to processQueue'));
     }
   });
   fetchQueue = [];
   isFetching = false;
 };
-
-export interface WebflowItem {
-  _id: string;
-  name: string;
-  slug: string;
-  [key: string]: any;
-}
 
 /**
  * Fetches items from Webflow CMS with caching and request queuing
@@ -53,7 +55,11 @@ export const getItems = async (forceRefresh = false): Promise<WebflowItem[]> => 
     const response = await fetch(
       `${webflowConfig.apiBaseUrl}/collections/${webflowConfig.collectionId}/items`,
       {
-        headers: getApiHeaders(),
+        headers: {
+          'Authorization': `Bearer ${webflowConfig.apiToken}`,
+          'accept-version': '1.0.0',
+          'Content-Type': 'application/json'
+        },
         next: { revalidate: 300 } // Revalidate every 5 minutes
       }
     );
@@ -62,7 +68,7 @@ export const getItems = async (forceRefresh = false): Promise<WebflowItem[]> => 
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as { items: WebflowItem[] };
     
     if (data.items) {
       cachedItems = data.items;
@@ -74,7 +80,15 @@ export const getItems = async (forceRefresh = false): Promise<WebflowItem[]> => 
     throw new Error('No items found in response');
   } catch (error) {
     console.error('Error fetching items from Webflow:', error);
-    processQueue(error as Error);
+    const errorObj = error instanceof Error ? error : new Error('Unknown error occurred');
+    processQueue(errorObj);
+    
+    // If we have cached items, return them even if there was an error
+    if (cachedItems.length > 0) {
+      console.warn('Using cached items due to error:', error);
+      return cachedItems;
+    }
+    
     throw error;
   }
 };
@@ -89,14 +103,16 @@ export const searchItems = async (query: string): Promise<WebflowItem[]> => {
 
   try {
     const items = await getItems();
-    const searchTerm = query.toLowerCase();
+    const queryLower = query.toLowerCase().trim();
+    const queryTerms = queryLower.split(/\s+/);
     
     return items.filter(item => {
-      // Search in name and any other relevant fields
-      return (
-        (item.name?.toLowerCase().includes(searchTerm)) ||
-        (item.description?.toLowerCase().includes(searchTerm)) ||
-        (item.content?.toLowerCase().includes(searchTerm))
+      // Check if all search terms match in any of the search fields
+      return queryTerms.every(term => 
+        webflowConfig.searchFields.some(field => {
+          const fieldValue = String(item[field] || '').toLowerCase();
+          return fieldValue.includes(term);
+        })
       );
     });
   } catch (error) {
