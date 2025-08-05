@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx @cloudflare/next-on-pages",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "npx @cloudflare/next-on-pages"
+    "deploy": "npx @cloudflare/next-on-pages",
+    "preview": "npx @cloudflare/next-on-pages --watch",
+    "cf-typegen": "npx @cloudflare/next-on-pages --experimental-minify-type-annotations"
   },
   "dependencies": {
     "lodash.debounce": "^4.0.8",
