@@ -1,0 +1,4 @@
+module.exports = {
+  buildCommand: 'npm run build',
+  outputDirectory: '.vercel/output/static'
+}

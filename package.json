@@ -2,15 +2,15 @@
   "name": "nextjs-migration",
   "version": "0.1.0",
   "private": true,
- "scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "postbuild": "npx @cloudflare/next-on-pages --no-vercel",
-  "start": "next start",
-  "lint": "next lint",
-  "type-check": "tsc --noEmit",
-  "deploy": "npm run build"
-},
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "postbuild": "npx @cloudflare/next-on-pages@1",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "deploy": "npm run build"
+  },
   "dependencies": {
     "lodash.debounce": "^4.0.8",
     "next": "^15.4.5",
